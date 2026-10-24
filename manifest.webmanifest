@@ -1,6 +1,6 @@
 {
-  "name": "نظام البريكات",
-  "short_name": "البريكات",
+  "name": "مركز الاتصال",
+  "short_name": "مركز الاتصال",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>نظام البريكات</title>
+<title>مركز الاتصال</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="theme-color" content="#00344B">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="نظام البريكات">
+<meta name="apple-mobile-web-app-title" content="مركز الاتصال">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style>
   html, body { margin: 0; height: 100%; background: #00344B; }
@@ -66,7 +66,7 @@ if (!('Notification' in window) || !('serviceWorker' in navigator)) {
       var token = await messaging.getToken({ vapidKey: VAPID, serviceWorkerRegistration: reg });
       messaging.onMessage(function (p) {
         var n = p.notification || {};
-        reg.showNotification(n.title || 'نظام البريكات', { body: n.body || '', icon: 'icon-192.png' });
+        reg.showNotification(n.title || 'مركز الاتصال', { body: n.body || '', icon: 'icon-192.png' });
       });
       $('bell').textContent = '🔔 الإشعارات مفعّلة';
       say('تم التفعيل. هذا رمز جهازك (للتجربة فقط):', token);
