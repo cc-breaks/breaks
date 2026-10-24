@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>مركز الاتصال</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="theme-color" content="#00344B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="مركز الاتصال">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<style>
+  html, body { margin: 0; height: 100%; background: #00344B; }
+  iframe { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; background: #fff; }
+  #bell { position: fixed; left: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 5;
+    font: 600 14px Tahoma, sans-serif; background: #40BCA9; color: #00344B; border: 0; border-radius: 22px;
+    padding: 10px 16px; box-shadow: 0 2px 8px rgba(0,0,0,.3); }
+  #panel { position: fixed; inset: auto 12px calc(64px + env(safe-area-inset-bottom)) 12px; z-index: 6; display: none;
+    background: #fff; color: #0D2430; border-radius: 12px; padding: 14px; font: 14px/1.6 Tahoma, sans-serif;
+    box-shadow: 0 4px 16px rgba(0,0,0,.35); }
+  #panel textarea { width: 100%; height: 90px; box-sizing: border-box; direction: ltr; font: 12px monospace; }
+  #panel button { margin-top: 8px; padding: 8px 14px; border: 0; border-radius: 8px; background: #00344B; color: #fff; font: inherit; }
+</style>
+</head>
+<body>
+<iframe id="app" src="https://script.google.com/macros/s/AKfycbyFn1reZjGeW93Cnw66EwqIUuVnBE6zCPfcyoqi05hHrt54e89EDT41PN3eJQG25TUG/exec" allow="autoplay; clipboard-write"></iframe>
+<button id="bell" type="button">🔔 تفعيل الإشعارات</button>
+<div id="panel"><div id="msg"></div><textarea id="tok" readonly hidden></textarea><button id="close" type="button">إغلاق</button></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
+<script>
+var VAPID = 'BJDlvbaGCn0GI9QReNTiUGu7lIdxw2sLV9dacSzyDRtE-nUArGP1B7wMzs-8NE2fKbkRLgShUMLerGuVTrcUYCs';
+var $ = function (id) { return document.getElementById(id); };
+function say(t, tok) {
+  $('msg').textContent = t; $('panel').style.display = 'block';
+  $('tok').hidden = !tok; if (tok) { $('tok').value = tok; $('tok').select(); }
+}
+$('close').onclick = function () { $('panel').style.display = 'none'; };
+
+if (!('Notification' in window) || !('serviceWorker' in navigator)) {
+  // آيفون: الإشعارات لا تعمل إلا بعد إضافة التطبيق للشاشة الرئيسية
+  $('bell').onclick = function () { say('لتفعيل الإشعارات على الآيفون: افتح الرابط من Safari ثم Share ← Add to Home Screen، وافتح التطبيق من الأيقونة.'); };
+} else {
+  if (navigator.serviceWorker) navigator.serviceWorker.register('firebase-messaging-sw.js');
+  if (Notification.permission === 'granted') $('bell').textContent = '🔔 الإشعارات مفعّلة';
+  $('bell').onclick = async function () {
+    try {
+      firebase.initializeApp({
+        apiKey: 'AIzaSyAb4dP5oiqO0SL-uEpy9hZNKbYqh6gP14k',
+        authDomain: 'break-a75fc.firebaseapp.com',
+        projectId: 'break-a75fc',
+        storageBucket: 'break-a75fc.firebasestorage.app',
+        messagingSenderId: '782726739521',
+        appId: '1:782726739521:web:cc148df5a957264a6b78c0'
+      });
+    } catch (e) {}
+    try {
+      var perm = await Notification.requestPermission();
+      if (perm !== 'granted') { say('لم يتم السماح بالإشعارات. فعّلها من إعدادات المتصفح أو الجهاز.'); return; }
+      var reg = await navigator.serviceWorker.ready;
+      var messaging = firebase.messaging();
+      var token = await messaging.getToken({ vapidKey: VAPID, serviceWorkerRegistration: reg });
+      messaging.onMessage(function (p) {
+        var n = p.notification || {};
+        reg.showNotification(n.title || 'مركز الاتصال', { body: n.body || '', icon: 'icon-192.png' });
+      });
+      $('bell').textContent = '🔔 الإشعارات مفعّلة';
+      say('تم تفعيل الإشعارات على هذا الجهاز.');
+    } catch (e) { say('تعذّر التفعيل: ' + (e && e.message ? e.message : e)); }
+  };
+}
+</script>
+</body>
+</html>
