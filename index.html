@@ -69,7 +69,7 @@ if (!('Notification' in window) || !('serviceWorker' in navigator)) {
         reg.showNotification(n.title || 'مركز الاتصال', { body: n.body || '', icon: 'icon-192.png' });
       });
       $('bell').textContent = '🔔 الإشعارات مفعّلة';
-      say('تم التفعيل. هذا رمز جهازك (للتجربة فقط):', token);
+         say('تم تفعيل الإشعارات على هذا الجهاز.');
     } catch (e) { say('تعذّر التفعيل: ' + (e && e.message ? e.message : e)); }
   };
 }
