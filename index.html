@@ -47,32 +47,14 @@ if (!('Notification' in window) || !('serviceWorker' in navigator)) {
 } else {
   if (navigator.serviceWorker) navigator.serviceWorker.register('firebase-messaging-sw.js');
   if (Notification.permission === 'granted') $('bell').textContent = '🔔 الإشعارات مفعّلة';
+  // تنبيهات النظام (داخل الإطار) تظهر كإشعار ويندوز عندما تكون النافذة غير نشطة
+  window.addEventListener('message', function (e) {
+    var d = e.data;
+    if (!d || d.brk !== 'notify' || !/^https:\/\/[a-z0-9-]+\.googleusercontent\.com$/.test(e.origin)) return;
+    if (Notification.permission !== 'granted' || document.hasFocus()) return;
+    navigator.serviceWorker.ready.then(function (reg) { reg.showNotification('مركز الاتصال', { body: String(d.body || ''), icon: 'icon-192.png' }); });
+  });
   $('bell').onclick = async function () {
     try {
       firebase.initializeApp({
-        apiKey: 'AIzaSyAb4dP5oiqO0SL-uEpy9hZNKbYqh6gP14k',
-        authDomain: 'break-a75fc.firebaseapp.com',
-        projectId: 'break-a75fc',
-        storageBucket: 'break-a75fc.firebasestorage.app',
-        messagingSenderId: '782726739521',
-        appId: '1:782726739521:web:cc148df5a957264a6b78c0'
-      });
-    } catch (e) {}
-    try {
-      var perm = await Notification.requestPermission();
-      if (perm !== 'granted') { say('لم يتم السماح بالإشعارات. فعّلها من إعدادات المتصفح أو الجهاز.'); return; }
-      var reg = await navigator.serviceWorker.ready;
-      var messaging = firebase.messaging();
-      var token = await messaging.getToken({ vapidKey: VAPID, serviceWorkerRegistration: reg });
-      messaging.onMessage(function (p) {
-        var n = p.notification || {};
-        reg.showNotification(n.title || 'مركز الاتصال', { body: n.body || '', icon: 'icon-192.png' });
-      });
-      $('bell').textContent = '🔔 الإشعارات مفعّلة';
-      say('تم تفعيل الإشعارات على هذا الجهاز.');
-    } catch (e) { say('تعذّر التفعيل: ' + (e && e.message ? e.message : e)); }
-  };
-}
-</script>
-</body>
-</html>
+        apiKey:
